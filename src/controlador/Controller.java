@@ -4,14 +4,18 @@ import java.util.List;
 import java.util.Scanner;
 
 import modelo.entidades.Coche;
-
-
+import modelo.entidades.Pasajero;
 import modelo.persistencia.DaoCocheMySql;
+import modelo.persistencia.DaoPasajeroMySql;
 import modelo.persistencia.interfaces.DaoCoche;
+import modelo.persistencia.interfaces.DaoPasajero;
 
 public class Controller {
 	
 	DaoCoche dc = new DaoCocheMySql();
+	DaoPasajero dp = new DaoPasajeroMySql();
+	
+	
 	
 	public void run() {
 		
@@ -19,7 +23,7 @@ public class Controller {
 		
 		op = menu();
 		
-		while (op != 6) {
+		while (op != 7) {
 			switch (op)
 			{
 				case 1:
@@ -37,6 +41,9 @@ public class Controller {
 				case 5:
 					listarCoches();
 					break;
+				case 6:
+					gestionarPasajeros();
+					break;
 			}
 			op = menu();
 		}
@@ -44,6 +51,130 @@ public class Controller {
 		
 	}
 
+	private void gestionarPasajeros() {
+		int op;
+		
+		op = menuPasajeros();
+		while (op != 7) {
+			switch (op) {
+				case 1:
+					añadirPasajero();
+					break;
+				case 2:
+					borrarPasajero();
+					break;
+				case 3:
+					consultarPasajero();
+					break;
+				case 4:
+					listarPasajeros();
+					break;
+				case 5:
+					añadirPasajeroACoche();
+					break;
+				case 6:
+					eliminarPasajeroDeCoche();
+					break;
+			}
+			op = menuPasajeros();
+		}
+	}
+	
+	
+	private void eliminarPasajeroDeCoche() {
+		
+		
+	}
+
+	private void añadirPasajeroACoche() {
+		Scanner sc = new Scanner (System.in);
+		int idBuscarCoche, idBuscarPasajero;
+		Coche c;
+		Pasajero p;
+		
+		System.out.println("Los coches que existen actualmente son: ");
+		listarCoches();
+		System.out.println("Elija un coche introduciendo su id: ");
+		idBuscarCoche = sc.nextInt();
+		
+		System.out.println("Los pasajeros que existen actualmente son: ");
+		listarPasajeros();
+		System.out.println("Elija un pasajero introduciendo su id: ");
+		idBuscarPasajero = sc.nextInt();
+	
+		c = dc.obtener(idBuscarCoche);
+		p = dp.obtener(idBuscarPasajero);
+		if (c == null)
+			System.out.println("Este coche no esta en la BBDD.");
+		else if (p == null) {
+			System.out.println("Este pasajero no esta en la BBDD.");
+		} else
+			dp.altaACoche(p.getId(), c.getId());
+	}
+	// ------------------------------------- CRUD PASAJEROS ---------------------------------------------------------------
+	private void listarPasajeros() {
+		List<Pasajero> pasajeros = dp.listar();
+		
+		for (Pasajero p : pasajeros)
+			System.out.println(p);
+		
+	}
+
+	private void consultarPasajero() {
+		Scanner sc = new Scanner (System.in);
+		int idBuscar;
+		Pasajero p;
+		
+		System.out.println("Introduzca el ID del pasajero a buscar: ");
+		idBuscar = sc.nextInt();
+		
+		p = dp.obtener(idBuscar);
+		if (p == null)
+			System.out.println("El pasajero con ID " + idBuscar + " NO se encuentra en la BBDD");
+		else 
+			System.out.println(p);
+		
+	}
+
+	private void borrarPasajero() {
+		Scanner sc = new Scanner (System.in);
+		int idBorrar;
+		
+		System.out.println("Introduzca el id del pasajero a borrar: ");
+		idBorrar = sc.nextInt();
+		if (dp.baja(idBorrar)) 
+			System.out.println("Se ha borrado con éxito de la BBDD");
+		else
+			System.out.println("NO se ha podido borrar el elemento de la BBDD");
+		
+	}
+
+	private void añadirPasajero() {
+		String nombre;
+		int edad;
+		double peso;
+		Scanner sc = new Scanner (System.in);
+		
+		System.out.println("Introduzca el nombre del pasajero: ");
+		nombre = sc.nextLine();
+		System.out.println("Introduzca la edad: ");
+		edad = sc.nextInt();
+		System.out.println("Introduzca el peso: ");
+		peso = sc.nextDouble();
+		
+		Pasajero p = new Pasajero(edad, peso, nombre);
+		
+		if(dp.alta(p))
+			System.out.println("Se ha añadido el pasajero.");
+		else
+			System.out.println("Ha habido un problema al añadir el pasajero a la BBDD");
+		
+	}
+
+	// ------------------------------------- FIN CRUD PASAJEROS ------------------------------------------------------------
+
+	
+	// ------------------------------------- CRUD COCHES ---------------------------------------------------------------
 	private void listarCoches() {
 		List<Coche> coches = dc.listar();
 		
@@ -79,6 +210,7 @@ public class Controller {
 		if (c == null)
 			System.out.println("El coche con ID " + idBuscar + " NO se encuentra en la BBDD");
 		else {
+			sc.nextLine(); //limpiar
 			System.out.println("Introduzca la nueva matricula: ");
 			c.setMatricula(sc.nextLine()); 
 			System.out.println("Introduzca la nueva marca: ");
@@ -127,6 +259,10 @@ public class Controller {
 			System.out.println("Se ha producido un ERROR al añadir el coche a la BBDD");
 	}
 
+	// ------------------------------------- FIN CRUD COCHES ---------------------------------------------------------------
+	
+
+	// ------------------------------------- MENÚS ------------------------------------------------------------
 	private int menu() {
 		int op;
 		Scanner sc = new Scanner(System.in);
@@ -137,7 +273,8 @@ public class Controller {
 		System.out.println("3. Consulta coche por ID.");
 		System.out.println("4. Modificar coche por ID.");
 		System.out.println("5. Listar coches");
-		System.out.println("6. Terminar el programa.");
+		System.out.println("6. Gestionar pasajeros.");
+		System.out.println("7. Terminar el programa.");
 		op = sc.nextInt();
 		
 		while (op < 1 || op > 6) {
@@ -147,7 +284,8 @@ public class Controller {
 			System.out.println("3. Consulta coche por ID.");
 			System.out.println("4. Modificar coche por ID.");
 			System.out.println("5. Listar coches");
-			System.out.println("6. Terminar el programa.");
+			System.out.println("6. Gestionar pasajeros.");
+			System.out.println("7. Terminar el programa.");
 			
 			op = sc.nextInt();
 
@@ -155,5 +293,31 @@ public class Controller {
 		return op;
 	}
 	
+	private int menuPasajeros() {
+		Scanner sc = new Scanner(System.in);
+		int op;
+		
+		System.out.println("1. Añadir nuevo pasajero.");
+		System.out.println("2. Borrar pasajero por ID.");
+		System.out.println("3. Consultar pasajero por ID.");
+		System.out.println("4. Listar todos los pasajeros.");
+		System.out.println("5. Añadir pasajero a un coche.");
+		System.out.println("6. Eliminar pasajero de un coche");
+		System.out.println("7. Volver al menú principal.");
+		op = sc.nextInt();
+		while (op < 1 || op > 7) {
+			System.out.println("ERROR EN LA ELECCION. Elija un valor entre 1 y 5");
+			System.out.println("1. Añadir nuevo pasajero.");
+			System.out.println("2. Borrar pasajero por ID.");
+			System.out.println("3. Consultar pasajero por ID.");
+			System.out.println("4. Listar todos los pasajeros.");
+			System.out.println("5. Añadir pasajero a un coche.");
+			System.out.println("6. Eliminar pasajero de un coche");
+			System.out.println("7. Volver al menú principal.");
+			op = sc.nextInt();
+			
+		}
+		return op;
+	}
 	
 }

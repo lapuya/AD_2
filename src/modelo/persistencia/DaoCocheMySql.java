@@ -79,7 +79,7 @@ public class DaoCocheMySql implements DaoCoche {
 		}
 		
 		boolean borrado = true;
-		String query = "delete from coches where id = ?";
+		String query = "delete from coches where coche_id = ?";
 		try {
 			PreparedStatement ps = conexion.prepareStatement(query);
 			ps.setInt(1, id);
@@ -112,7 +112,7 @@ public class DaoCocheMySql implements DaoCoche {
 			ps.setString(2, c.getMarca());
 			ps.setString(3, c.getModelo());
 			ps.setString(4, c.getColor());
-			ps.setInt(4, c.getId());
+			ps.setInt(5, c.getId());
 			
 			int numeroFilasAfectadas = ps.executeUpdate();
 			if(numeroFilasAfectadas == 0)
@@ -137,8 +137,8 @@ public class DaoCocheMySql implements DaoCoche {
 		}		
 		Coche coche = null;
 		
-		String query = "select ID,MATRICULA,MARCA,MODELO,COLOR from coches "
-				+ "where id = ?";
+		String query = "select COCHE_ID,MATRICULA,MARCA,MODELO,COLOR from coches "
+				+ "where coche_id = ?";
 		try {
 			PreparedStatement ps = conexion.prepareStatement(query);
 			ps.setInt(1, id);
@@ -159,8 +159,6 @@ public class DaoCocheMySql implements DaoCoche {
 		} finally {
 			cerrarConexion();
 		}
-		
-		
 		return coche;
 	}
 
@@ -171,7 +169,7 @@ public class DaoCocheMySql implements DaoCoche {
 		}		
 		List<Coche> coches = new ArrayList<>();
 		
-		String query = "select ID,MATRICULA,MARCA,MODELO,COLOR from coches";
+		String query = "select COCHE_ID,MATRICULA,MARCA,MODELO,COLOR from coches";
 		try {
 			PreparedStatement ps = conexion.prepareStatement(query);
 			
@@ -194,10 +192,6 @@ public class DaoCocheMySql implements DaoCoche {
 		} finally {
 			cerrarConexion();
 		}
-		
-		
 		return coches;
 	}
-	
-
 }
