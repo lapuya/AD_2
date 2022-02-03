@@ -42,6 +42,7 @@ public class DaoCocheMySql implements DaoCoche {
 	
 	// --------------------------------------------- CRUD -----------------------------------------------------------
 
+	//Alta de un coche en la BBDD
 	@Override
 	public boolean alta(Coche c) {
 		if(!abrirConexion()){
@@ -72,6 +73,7 @@ public class DaoCocheMySql implements DaoCoche {
 		return alta;
 	}
 
+	//Baja de un coche de la BBDD
 	@Override
 	public boolean baja(int id) {
 		if(!abrirConexion()){
@@ -98,6 +100,7 @@ public class DaoCocheMySql implements DaoCoche {
 		return borrado; 
 	}
 
+	//Modifica los datos de un coche dado
 	@Override
 	public boolean modificar(Coche c) {
 		if(!abrirConexion()){
@@ -130,6 +133,7 @@ public class DaoCocheMySql implements DaoCoche {
 		return modificado;
 	}
 
+	//Devuelve un coche dado un id
 	@Override
 	public Coche obtener(int id) {
 		if(!abrirConexion()){
@@ -162,6 +166,7 @@ public class DaoCocheMySql implements DaoCoche {
 		return coche;
 	}
 
+	//Devuelve una lista de todos los coches
 	@Override
 	public List<Coche> listar() {
 		if(!abrirConexion()){

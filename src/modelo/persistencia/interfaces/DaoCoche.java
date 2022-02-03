@@ -4,6 +4,9 @@ import java.util.List;
 
 import modelo.entidades.Coche;
 
+/*
+ * Interfaz del DAO Coche
+ */
 public interface DaoCoche {
 	public boolean alta(Coche c);
 	public boolean baja(int id);

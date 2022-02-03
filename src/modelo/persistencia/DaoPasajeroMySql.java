@@ -16,7 +16,8 @@ public class DaoPasajeroMySql implements DaoPasajero {
 	
 	private Connection conexion;
 
-	
+	// ------------------------------------- Métodos de apertura y cierre de conexión ---------------------------------------------------------------
+
 	public boolean abrirConexion(){
 		String url = "jdbc:mysql://localhost:3306/bbdd";
 		String usuario = "root";
@@ -41,6 +42,8 @@ public class DaoPasajeroMySql implements DaoPasajero {
 		return true;
 	}
 	
+	//Alta de un pasajero a la BBDD con insert -> se prepara el query, recogemos los datos con PreparedStatement
+	//Y ejecutamos. Si hay filas afectadas, se pudo hacer el alta.
 	@Override
 	public boolean alta(Pasajero p) {
 		if(!abrirConexion()){
@@ -66,10 +69,10 @@ public class DaoPasajeroMySql implements DaoPasajero {
 		} finally{
 			cerrarConexion();
 		}
-		
 		return alta;
 	}
 	
+	//Baja de un pasajero con delete -> preparamos query, recogemos el id (pasado por parametro) con PreparedStatement y ejecutamos
 	@Override
 	public boolean baja(int id) {
 		if(!abrirConexion()){
@@ -96,6 +99,7 @@ public class DaoPasajeroMySql implements DaoPasajero {
 		return borrado; 
 	}
 	
+	//Obtenemos la info de un pasajero con select y con el id pasado por parametro
 	@Override
 	public Pasajero obtener(int id) {
 		if(!abrirConexion()){
@@ -129,6 +133,7 @@ public class DaoPasajeroMySql implements DaoPasajero {
 		return pasajero;
 	}
 
+	//Lista todos los pasajeros con el query dado
 	@Override
 	public List<Pasajero> listar() {
 		if(!abrirConexion()){
@@ -161,6 +166,9 @@ public class DaoPasajeroMySql implements DaoPasajero {
 		return pasajeros;
 	}
 	
+	//Asignación de un pasajero a un coche -> establecemos el coche_id (que es una FK) al id del coche
+	//donde se esta metiendo el pasajero
+	@Override
 	public boolean altaACoche(int idPasajero, int idCoche) {
 		if(!abrirConexion()){
 			return false;
@@ -186,5 +194,102 @@ public class DaoPasajeroMySql implements DaoPasajero {
 			cerrarConexion();
 		}
 		return alta;
+	}
+
+	//Metodo que indica si un pasajero esta en un coche
+	@Override
+	public boolean pasajeroEnCoche(int idPasajero, int idCoche) {
+		// TODO Auto-generated method stub
+		if(!abrirConexion()){
+			return false;
+		}	
+		int cont = 0;
+		boolean enCoche = true;
+		Pasajero p;
+		String query = "SELECT * FROM pasajeros WHERE id=? AND coche_id=?";
+		try {
+			PreparedStatement ps = conexion.prepareStatement(query);
+			
+			ps.setInt(1, idPasajero);
+			ps.setInt(2, idCoche);
+			ResultSet rs = ps.executeQuery();
+			
+			while(rs.next()){
+				cont++;
+			}
+
+			if(cont == 0)
+				enCoche = false;
+			
+		} catch (SQLException e) {
+			System.out.println("Pasajero en coche -> error al obtener los pasajeros en coche.");
+			e.printStackTrace();
+		} finally {
+			cerrarConexion();
+		}
+		
+		return enCoche;
+	}
+
+	//Metodo que elimina un pasajero de un coche -> se pone su FK a NULL
+	@Override
+	public boolean BajaDeCoche(int id) {
+		if(!abrirConexion()){
+			return false;
+		}
+		boolean baja = true;
+		String query = "UPDATE pasajeros SET coche_id=null WHERE id=?";
+		try {
+			PreparedStatement ps = conexion.prepareStatement(query);
+			
+			ps.setInt(1, id);
+			
+			
+			int numeroFilasAfectadas = ps.executeUpdate();
+			if(numeroFilasAfectadas == 0)
+				baja = false;
+			
+		} catch (SQLException e) {
+			System.out.println("Baja de coche -> error al dar de baja un pasajero.");
+			e.printStackTrace();
+		} finally {
+			cerrarConexion();
+		}
+
+		return baja;
+	}
+
+	//Devuelve una lista con los pasajeros de un coche dado
+	@Override
+	public List<Pasajero> listarPasajerosEnCoche(int idCoche) {
+		if(!abrirConexion()){
+			return null;
+		}		
+		List<Pasajero> pasajeros = new ArrayList<>();
+		
+		String query = "select ID,NOMBRE,EDAD,PESO from pasajeros WHERE coche_id=?";
+		try {
+			PreparedStatement ps = conexion.prepareStatement(query);
+			
+			ps.setInt(1, idCoche);
+			ResultSet rs = ps.executeQuery();
+			
+			while(rs.next()){
+				Pasajero pasajero = new Pasajero();
+				
+				pasajero.setId(rs.getInt(1));
+				pasajero.setNombre(rs.getString(2));
+				pasajero.setEdad(rs.getInt(3));
+				pasajero.setPeso(rs.getDouble(4));
+
+				pasajeros.add(pasajero);
+			}
+		} catch (SQLException e) {
+			System.out.println("listar -> error al obtener los pasajeros.");
+			e.printStackTrace();
+		} finally {
+			cerrarConexion();
+		}
+		return pasajeros;
 	}
 }

@@ -66,7 +66,6 @@ public class Coche {
 	}
 	
 	//Métodos equals y hashCode para la comparación de objetos (no pueden coincidir en id ni matricula)
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
