@@ -15,7 +15,7 @@ public class DaoCocheMySql implements DaoCoche {
 	
 	private Connection conexion;
 	
-	// --------------------------------------------- MÉTODOS DE APERTURA Y CIERRE DE CONEXIÓN -----------------------------------------------------------
+	// --------------------------------------------- MÃ‰TODOS DE APERTURA Y CIERRE DE CONEXIÃ“N -----------------------------------------------------------
 	public boolean abrirConexion(){
 		String url = "jdbc:mysql://localhost:3306/bbdd";
 		String usuario = "root";
@@ -108,7 +108,7 @@ public class DaoCocheMySql implements DaoCoche {
 		}
 		boolean modificado = true;
 		String query = "update coches set MATRICULA=?, MARCA=?, "
-				+ "MODELO=?, COLOR=? WHERE ID=?";
+				+ "MODELO=?, COLOR=? WHERE COCHE_ID=?";
 		try {
 			PreparedStatement ps = conexion.prepareStatement(query);
 			ps.setString(1, c.getMatricula());
